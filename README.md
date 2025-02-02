@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
         <th>Notificación de actualización</th>
     </tr>
     <tr>
-        <td><img src="https://via.placeholder.com/300" alt="Diálogo de actualización"></td>
-        <td><img src="https://via.placeholder.com/300" alt="Notificación de actualización"></td>
+        <td><img src="https://perf3ctsolutions.com/cap1.jpg" alt="Diálogo de actualización"></td>
+        <td><img src="https://perf3ctsolutions.com/cap2.jpg" alt="Notificación de actualización"></td>
     </tr>
 </table>
 
