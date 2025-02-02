@@ -40,7 +40,7 @@
 <h3>2. Agrega la dependencia</h3>
 <p>Luego, agrega la dependencia de la librería en el archivo <code>build.gradle</code> de tu módulo:</p>
 <pre><code>dependencies {
-    implementation 'com.github.lenier522:Update-Checker:1.0'
+    implementation 'com.github.lenier522:Update-Checker:1.1'
 }
 </code></pre>
 
