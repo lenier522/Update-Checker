@@ -41,6 +41,7 @@
 <p>Luego, agrega la dependencia de la librería en el archivo <code>build.gradle</code> de tu módulo:</p>
 <pre><code>dependencies {
     implementation 'com.github.lenier522:Update-Checker:1.1'
+    implementation 'com.google.code.gson:gson:2.12.1'
 }
 </code></pre>
 
