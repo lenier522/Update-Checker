@@ -1,0 +1,8 @@
+#configurar file para libreria en github
+jdk:
+  - openjdk17
+before_install:
+  - ./scripts/prepareJitpackEnvironment.sh
+install:
+  - FILE="-Dfile=update-chaker-release.aar"
+  - mvn install:install-file $FILE -DgroupId=com.github.lenier522 -DartifactId=update-chaker -Dversion=1.0 -Dpackaging=aar -DgeneratePom=true
