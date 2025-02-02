@@ -1,5 +1,19 @@
+buildscript {
+    ext.kotlin_version = '1.7.20'
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 plugins {
     alias(libs.plugins.android.library)
+    id 'maven-publish'
 }
 
 android {
@@ -17,13 +31,27 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            consumerProguardFile 'proguard-rules.pro'
+            consumerProguardFile 'consumer-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of( 17)
+    }
+}
+
+java {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+}
+
 
 dependencies {
 
@@ -33,4 +61,20 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+}
+
+publishing{
+    publications{
+        maven(MavenPublication){
+            groupId = 'com.github.lenier522'
+            artifactId = 'update-chaker'
+            version = "1.0"
+            pom{
+                description = 'First Android Library'
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
