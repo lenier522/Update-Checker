@@ -10,6 +10,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -172,7 +173,7 @@ public class UpdateChecker {
                 while (downloading) {
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(downloadId);
-                    var cursor = manager.query(query);
+                    Cursor cursor = manager.query(query);
                     if (cursor.moveToFirst()) {
                         int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
                         if (status == DownloadManager.STATUS_SUCCESSFUL) {
