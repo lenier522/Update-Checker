@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
@@ -27,17 +27,31 @@
 
 <h2>Configuración</h2>
 
-<h3>1. Agrega la librería a tu proyecto</h3>
-<p>Descarga el archivo <code>UpdateChecker.java</code> y agrégalo a tu proyecto en la carpeta <code>com.lenier.update_checker</code>.</p>
+<h3>1. Agrega JitPack a tu proyecto</h3>
+<p>Para usar la librería, primero debes agregar JitPack como repositorio en tu archivo <code>build.gradle</code> a nivel de proyecto:</p>
+<pre><code>allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+</code></pre>
 
-<h3>2. Configura los permisos en <code>AndroidManifest.xml</code></h3>
+<h3>2. Agrega la dependencia</h3>
+<p>Luego, agrega la dependencia de la librería en el archivo <code>build.gradle</code> de tu módulo:</p>
+<pre><code>dependencies {
+    implementation 'com.github.lenier522:Update-Checker:1.0'
+}
+</code></pre>
+
+<h3>3. Configura los permisos en <code>AndroidManifest.xml</code></h3>
 <pre><code>&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
 &lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /&gt;
 &lt;uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /&gt;
 &lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS" /&gt; &lt;!-- Solo para Android 13+ --&gt;
 </code></pre>
 
-<h3>3. Configura el <code>FileProvider</code> en <code>AndroidManifest.xml</code></h3>
+<h3>4. Configura el <code>FileProvider</code> en <code>AndroidManifest.xml</code></h3>
 <pre><code>&lt;provider
     android:name="androidx.core.content.FileProvider"
     android:authorities="${applicationId}.provider"
@@ -49,7 +63,7 @@
 &lt;/provider&gt;
 </code></pre>
 
-<h3>4. Crea el archivo <code>file_paths.xml</code> en <code>res/xml</code></h3>
+<h3>5. Crea el archivo <code>file_paths.xml</code> en <code>res/xml</code></h3>
 <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;paths xmlns:android="http://schemas.android.com/apk/res/android"&gt;
     &lt;external-path name="external_files" path="." /&gt;
