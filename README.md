@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<h1>Update-Checker</h1>
+<h1>Update-Checker Android</h1>
 
 <p><strong>Update-Checker</strong> es una librería ligera para Android que permite verificar y descargar actualizaciones de tu aplicación desde un servidor remoto. La librería utiliza un archivo JSON para obtener la información de la última versión disponible y gestiona la descarga e instalación del APK.</p>
 
