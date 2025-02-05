@@ -12,9 +12,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
@@ -39,19 +40,20 @@ public class UpdateChecker {
     /**
      * Método que inicia la verificación de actualizaciones.
      *
-     * @param context           Contexto de la aplicación.
+     * @param context            Contexto de la aplicación.
      * @param currentVersionCode Código de versión actual de la app.
-     * @param jsonUrl           URL del JSON con la información de la actualización.
-     * @param useNotification   true para usar notificación, false para un AlertDialog.
+     * @param jsonUrl            URL del JSON con la información de la actualización.
+     * @param useNotification    true para usar notificación, false para un AlertDialog.
      */
     public static void checkForUpdate(Context context, int currentVersionCode, String jsonUrl, boolean useNotification) {
-        new CheckUpdateTask(context, currentVersionCode, jsonUrl, useNotification).execute();
+        // Se inicia un nuevo hilo para realizar la operación en segundo plano.
+        new Thread(new CheckUpdateTask(context, currentVersionCode, jsonUrl, useNotification)).start();
     }
 
     /**
-     * Clase AsyncTask para verificar la actualización en segundo plano.
+     * Clase que implementa Runnable para verificar la actualización en segundo plano.
      */
-    private static class CheckUpdateTask extends AsyncTask<Void, Void, JsonObject> {
+    private static class CheckUpdateTask implements Runnable {
         private final Context context;
         private final int currentVersionCode;
         private final String jsonUrl;
@@ -65,7 +67,8 @@ public class UpdateChecker {
         }
 
         @Override
-        protected JsonObject doInBackground(Void... voids) {
+        public void run() {
+            JsonObject jsonObject = null;
             try {
                 URL url = new URL(jsonUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -77,15 +80,27 @@ public class UpdateChecker {
                     response.append(line);
                 }
                 reader.close();
-                return JsonParser.parseString(response.toString()).getAsJsonObject();
+                jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
             } catch (Exception e) {
                 Log.e("UpdateChecker", "Error verificando actualización", e);
-                return null;
             }
+
+            final JsonObject result = jsonObject;
+            // Postear la actualización al hilo principal para interactuar con la UI
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    onPostExecute(result);
+                }
+            });
         }
 
-        @Override
-        protected void onPostExecute(JsonObject jsonObject) {
+        /**
+         * Método que se ejecuta en el hilo principal tras finalizar la tarea en segundo plano.
+         *
+         * @param jsonObject Objeto JSON obtenido del servidor.
+         */
+        private void onPostExecute(JsonObject jsonObject) {
             if (jsonObject != null) {
                 try {
                     int latestVersionCode = jsonObject.get("latest_version_code").getAsInt();
@@ -132,10 +147,10 @@ public class UpdateChecker {
             }
         }
 
-        // ✅ Comprobación de permisos en Android 13+
+        // Comprobación de permisos en Android 13+ para mostrar notificaciones
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            return; // ⛔ No se puede mostrar la notificación sin permiso
+            return; // No se puede mostrar la notificación sin el permiso correspondiente
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(apkUrl));
@@ -168,21 +183,22 @@ public class UpdateChecker {
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             long downloadId = manager.enqueue(request);
 
+            // Se inicia un hilo que monitorea el estado de la descarga
             new Thread(() -> {
                 boolean downloading = true;
                 while (downloading) {
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(downloadId);
                     Cursor cursor = manager.query(query);
-                    if (cursor.moveToFirst()) {
+                    if (cursor != null && cursor.moveToFirst()) {
                         int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
                         if (status == DownloadManager.STATUS_SUCCESSFUL) {
                             downloading = false;
                             String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/update.apk";
                             installApk(context, filePath);
                         }
+                        cursor.close();
                     }
-                    cursor.close();
                 }
             }).start();
         } catch (Exception e) {
@@ -214,5 +230,3 @@ public class UpdateChecker {
         }
     }
 }
-
-
