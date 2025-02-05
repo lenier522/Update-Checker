@@ -96,12 +96,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Verificar actualización al iniciar la actividad
-        int currentVersionCode = BuildConfig.VERSION_CODE; // Código de versión actual
-        String jsonUrl = "https://tudominio.com/update.json"; // URL del JSON
-        boolean useNotification = false; // Usar diálogo en lugar de notificación
+            PackageInfo pinfo = null;
+        try {
+            pinfo = getPackageManager().getPackageInfo(getPackageName(),0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        int currentVersion = pinfo.versionCode;
+     //   String currentVersionCode = String.valueOf(currentVersion);
 
-        UpdateChecker.checkForUpdate(this, currentVersionCode, jsonUrl, useNotification);
+        String jsonUrl = "https://perf3ctsolutions.com/update.json"; // URL del JSON
+        UpdateChecker.checkForUpdate(this,currentVersion,jsonUrl,true);
+
+    /*    TextView txt = findViewById(R.id.textView);
+        txt.setText(currentVersionCode);
+        */
     }
 }
 </code></pre>
